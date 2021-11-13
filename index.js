@@ -1,11 +1,96 @@
 const express = require('express')
 const app = express()
 const cors=require("cors")
-const port = 5000
+const ObjectId=require("mongodb").ObjectId;
+require('dotenv').config()
+const { MongoClient } = require('mongodb');
+const port = process.env.PORT ||5000
 
-// password : SF2CLYbfmkuGNkfD
+
 app.use(cors());
  app.use(express.json())
+
+ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.qbrq9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+console.log(uri);
+
+
+
+async function run() {
+  try {
+    await client.connect();
+    const database = client.db("DroneProducts");
+    const productsCollection = database.collection("products");
+  const purchaseCollection=database.collection("purchase")
+  const reviewsCollection=database.collection("reviews")
+ const usersCollection=database.collection("users");
+
+   app.get("/products",async(req,res)=>{
+        const result=await productsCollection.find({}).toArray();
+        res.json(result);
+
+        app.post("/purchase",async(req,res)=>{
+          const query=req.body;
+          console.log(query);
+           const result=await purchaseCollection.insertOne(query);
+           res.json(result);
+        })
+        
+   })
+
+   app.get("/allPurchase",async(req,res)=>{
+    const email=req.query.email;
+    const query={email:email};
+  const result=await purchaseCollection.find(query).toArray();
+  res.json(result)
+  })
+ app.delete("/allPurchase/:id",async(req,res)=>{
+   const id=req.params.id;
+   const query={_id:ObjectId(id)};
+   const result=await purchaseCollection.deleteOne(query);
+   res.json(result);
+ })
+
+ app.get("/reviews",async(req,res)=>{
+   const result=await reviewsCollection.find({}).toArray()
+   res.json(result);  
+ })
+
+ app.post("/review",async(req,res)=>{
+   const query=req.body
+  const result= await reviewsCollection.insertOne(query);
+  res.json(result);
+ })
+
+ app.post("/users",async(req,res)=>{
+   const query=req.body;
+   const result=await usersCollection.insertOne(query);
+   res.json(result);
+ })
+ app.put("/users/admin",async(req,res)=>{
+   const user=req.body
+   const filter={email:user.email}
+   const updateDoc={$set: {role:"admin"}}
+   const result=await usersCollection.updateOne(filter,updateDoc)
+   res.json(result)
+ })
+
+ app.get("/users/admin/:email",async(req,res)=>{
+   const email=req.params.email;
+   const query={email:email}
+   const result=await usersCollection.findOne(query)
+   let isAdmin=false
+   if(result?.role==="admin"){
+            isAdmin=true;
+   }
+   res.json({admin:isAdmin})
+ })
+  } finally {
+    // await client.close();
+  }
+}
+run().catch();
 
 app.get('/', (req, res) => {
   res.send('Hello from niche !')
