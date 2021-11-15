@@ -29,15 +29,44 @@ async function run() {
    app.get("/products",async(req,res)=>{
         const result=await productsCollection.find({}).toArray();
         res.json(result);
+        
+      })
+      app.post("/products",async(req,res)=>{
+        const product=req.body
+        const result=await productsCollection.insertOne(product);
+        res.json(result);
+      })
+      app.delete("/products/:id",async(req,res)=>{
+        const id=req.params.id;
+          const query={_id:ObjectId(id)}
+          const result=await productsCollection.deleteOne(query);
+          res.json(result);
+      })
 
         app.post("/purchase",async(req,res)=>{
           const query=req.body;
-          console.log(query);
+         
            const result=await purchaseCollection.insertOne(query);
            res.json(result);
         })
-        
-   })
+        app.get("/purchase",async(req,res)=>{
+          const result=await purchaseCollection.find({}).toArray();
+          res.json(result);
+        })
+        app.put("/purchase/:id",async(req,res)=>{
+           const id=req.params.id
+      
+           const updateBody=req.body
+           const filter={_id:ObjectId(id)}
+           const updateDoc={
+             $set:{
+               status:"shipped"
+             }
+           }
+           const result=await purchaseCollection.updateOne(filter,updateDoc,updateBody);
+           res.json(result);
+        })
+   
 
    app.get("/allPurchase",async(req,res)=>{
     const email=req.query.email;
@@ -45,6 +74,7 @@ async function run() {
   const result=await purchaseCollection.find(query).toArray();
   res.json(result)
   })
+
  app.delete("/allPurchase/:id",async(req,res)=>{
    const id=req.params.id;
    const query={_id:ObjectId(id)};
@@ -86,6 +116,7 @@ async function run() {
    }
    res.json({admin:isAdmin})
  })
+ 
   } finally {
     // await client.close();
   }
