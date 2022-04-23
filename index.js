@@ -79,24 +79,24 @@ async function run() {
    const id=req.params.id;
    const query={_id:ObjectId(id)};
    const result=await purchaseCollection.deleteOne(query);
-   res.json(result);
+   res.json(result)
  })
 
  app.get("/reviews",async(req,res)=>{
    const result=await reviewsCollection.find({}).toArray()
-   res.json(result);  
+   res.json(result)
  })
 
  app.post("/review",async(req,res)=>{
    const query=req.body
   const result= await reviewsCollection.insertOne(query);
-  res.json(result);
+  res.json(result)
  })
 
  app.post("/users",async(req,res)=>{
    const query=req.body;
    const result=await usersCollection.insertOne(query);
-   res.json(result);
+   res.json(result)
  })
  app.put("/users/admin",async(req,res)=>{
    const user=req.body
