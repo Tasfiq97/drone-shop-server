@@ -18,7 +18,7 @@ app.use(cors());
 
 async function run() {
   try {
-    await client.connect();
+     client.connect();
     const database = client.db("DroneProducts");
     const productsCollection = database.collection("products");
   const purchaseCollection=database.collection("purchase")
