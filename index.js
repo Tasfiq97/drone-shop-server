@@ -6,9 +6,6 @@ require("dotenv").config();
 const { MongoClient } = require("mongodb");
 const port = process.env.PORT || 5000;
 
-// <!-- PORT=9999
-// DB_USER=droneDb
-// DB_PASS=w2QDnbavZFBn2L3e -->
 app.use(cors());
 app.use(express.json());
 
