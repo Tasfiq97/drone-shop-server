@@ -9,8 +9,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.qbrq9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-// console.log(uri + "hey");
+const uri = process.env.MONGODB_URL;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -18,7 +17,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    client.connect();
+   await client.connect();
     const database = client.db("DroneProducts");
     const productsCollection = database.collection("products");
     const purchaseCollection = database.collection("purchase");
